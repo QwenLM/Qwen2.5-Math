@@ -1,4 +1,3 @@
-## Quick Start
 ### Requirements
 You can install the required packages with the following command:
 ```bash
