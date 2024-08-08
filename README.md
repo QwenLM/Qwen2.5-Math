@@ -91,6 +91,29 @@ We strongly advise users, especially those in mainland China, to use ModelScope.
 
 ## Performance
 
+> <div align="center">
+> <b>
+> 🚨 This model mainly supports English. We will release bilingual (English and Chinese) math models soon.
+> </b>
+> </div>
+
+We evaluate our math-specific models on a series of math benchmarks. The results below demonstrate that our largest math-specific model Qwen2-Math-72B-Instruct outperforms the state-of-the-art models, including GPT-4o, Claude-3.5-Sonnet, Gemini-1.5-Pro, Llama-3.1-405B.
+
+We evaluate our Qwen2-Math-Base models on three widely used English math benchmarks GSM8K, Math, and MMLU-STEM. We also evaluate three Chinese math benchmarks: CMATH, GaoKao Math Cloze, and GaoKao Math QA. All evaluations use few-shot chain-of-thought prompting. 
+
+<p align="center">
+    <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/Base-Table1.png" width="800"/>
+<p>
+
+We evaluate Qwen2-Math-Instruct on mathematical benchmarks in both English and Chinese. In addition to the widely-used benchmarks, such as GSM8K and Math, we also involve more exams that are much challenging to fully inspect the capabilities of Qwen2-Math-Instruct, such as OlympiadBench, CollegeMath, GaoKao, AIME2024, and AMC2023. For Chinese mathematical benchmarks, we use CMATH, Gaokao (Chinese college entrance examination 2024), and CN Middle School 24 (China High School Entrance Examination 2024). We report greedy and RM@8 performance on all benchmarks in the zero-shot setting, except for the multi-choice benchmark with a few-shot setting, such as MMLU (STEM), and some multi-choice questions in GaoKao and CN Middle School 24.
+
+<p align="center">
+    <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/Instruct-Table1.png" width="800"/>
+<p>
+
+<p align="center">
+    <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/Instruct-Table2.png" width="800"/>
+<p>
 
 ## Evaluation
 
