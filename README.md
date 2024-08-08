@@ -97,6 +97,10 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 We strongly advise users, especially those in mainland China, to use ModelScope. `snapshot_download` can help you solve issues concerning downloading checkpoints.
 
 ## Performance
+<<<<<<< HEAD
+=======
+
+>>>>>>> 79e7b1b59f0c23d0f00141db0ee9d24791960238
 We evaluate our Qwen2-Math-Base models on three widely used English math benchmarks GSM8K, Math, and MMLU-STEM. We also evaluate three Chinese math benchmarks: CMATH, GaoKao Math Cloze, and GaoKao Math QA. All evaluations use few-shot chain-of-thought prompting. 
 
 <p align="center">
