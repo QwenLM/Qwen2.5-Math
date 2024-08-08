@@ -98,10 +98,6 @@ We strongly advise users, especially those in mainland China, to use ModelScope.
 
 ## Performance
 
-
-
-We evaluate our math-specific models on a series of math benchmarks. The results below demonstrate that our largest math-specific model Qwen2-Math-72B-Instruct outperforms the state-of-the-art models, including GPT-4o, Claude-3.5-Sonnet, Gemini-1.5-Pro and Llama-3.1-405B.
-
 We evaluate our Qwen2-Math-Base models on three widely used English math benchmarks GSM8K, Math, and MMLU-STEM. We also evaluate three Chinese math benchmarks: CMATH, GaoKao Math Cloze, and GaoKao Math QA. All evaluations use few-shot chain-of-thought prompting. 
 
 <p align="center">
