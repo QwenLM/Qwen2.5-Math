@@ -81,7 +81,7 @@ PROMPT_TEMPLATES = {
     "direct": ("Question: {input}\nAnswer: ", "{output}", "\n\n"),
     "cot": ("Question: {input}\nAnswer: ", "{output}", "\n\n\n"),
     "pal": ("Question: {input}\n\n", "{output}", "\n---\n"),
-    "tool-integreted": ("Question: {input}\n\nSolution:\n", "{output}", "\n---\n"),
+    "tool-integrated": ("Question: {input}\n\nSolution:\n", "{output}", "\n---\n"),
     "self-instruct": ("<|user|>\n{input}\n<|assistant|>\n", "{output}", "\n"),
     "tora": ("<|user|>\n{input}\n<|assistant|>\n", "{output}", "\n"),
     "wizard_zs": (
