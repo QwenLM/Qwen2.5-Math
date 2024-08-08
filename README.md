@@ -49,7 +49,7 @@ For requirements on GPU memory and the respective throughput, see similar result
 >
 > **Qwen2-Math-72B-Instruct** is an instruction model for chatting;
 >
-> **Qwen2-Math-72B** is a base model typically used for completion and few-shot inference, serving as a better starting point for fine-tuning.
+> **Qwen2-Math-72B** is a base model typically used for few-shot inference, serving as a better starting point for fine-tuning.
 > 
 
 ### 🤗 Hugging Face Transformers
