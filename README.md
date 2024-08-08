@@ -23,7 +23,7 @@ Visit our Hugging Face or ModelScope organization (click the links above). Searc
 
 Over the past year, we have dedicated significant effort to researching and enhancing the reasoning capabilities of large language models, with a particular focus on their ability to solve arithmetic and mathematical problems. Today, we are delighted to introduce a series of math-specific large language models of our Qwen2 series, Qwen2-Math, and Qwen2-Math-Instruct-1.5B/7B/72B. Qwen2-Math is a series of specialized math language models built upon the Qwen2 LLMs, which significantly outperforms the mathematical capabilities of open-source models and even closed-source models (e.g., GPT4o). We hope that Qwen2-Math can contribute to the scientific community by solving advanced mathematical problems that require complex, multi-step logical reasoning.
 
-Detailed performance and introduction are shown in this <a href=""> 📑 blog</a>.
+Detailed performance and introduction are shown in this <a href="https://qwenlm.github.io/blog/qwen2-math/"> 📑 blog</a>.
 
 ## Requirements
 * `transformers>=4.40.0` for Qwen2-Math models. The latest version is recommended.
@@ -87,7 +87,7 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 ```
 
 ### 🤖 ModelScope
-We strongly advise users especially those in mainland China to use ModelScope. `snapshot_download` can help you solve issues concerning downloading checkpoints.
+We strongly advise users, especially those in mainland China, to use ModelScope. `snapshot_download` can help you solve issues concerning downloading checkpoints.
 
 ## Performance
 
@@ -95,7 +95,7 @@ We strongly advise users especially those in mainland China to use ModelScope. `
 ## Evaluation
 
 Our evaluation is adapted from [math-evaluation-harness](https://github.com/ZubinGou/math-evaluation-harness).
-Feel free to reproduce results of all instruction models in the Qwen2-Math series with scripts in [evaluation](./evaluation).
+Feel free to reproduce the results of all instruction models in the Qwen2-Math series with scripts in [evaluation](./evaluation).
 
 ### Requirements
 
@@ -138,14 +138,19 @@ bash sh/eval.sh $PROMPT_TYPE $MODEL_NAME_OR_PATH $OUTPUT_DIR
 ```
 
 ## Citation
-If you find our work helpful, feel free to give us a cite.
+If you find our work helpful, feel free to give us a citation.
 
 ```bibtex
-WIP
+@article{yang2024qwen2,
+  title={Qwen2 technical report},
+  author={Yang, An and Yang, Baosong and Hui, Binyuan and Zheng, Bo and Yu, Bowen and Zhou, Chang and Li, Chengpeng and Li, Chengyuan and Liu, Dayiheng and Huang, Fei and others},
+  journal={arXiv preprint arXiv:2407.10671},
+  year={2024}
+}
 ```
 
 ## Contact Us
-If you are interested to leave a message to either our research team or product team, join our [Discord](https://discord.gg/z3GAxXZ9Ce) or [WeChat groups](https://github.com/QwenLM/Qwen/blob/main/assets/wechat.png)!
+If you are interested in leaving a message to either our research team or product team, join our [Discord](https://discord.gg/z3GAxXZ9Ce) or [WeChat groups](https://github.com/QwenLM/Qwen/blob/main/assets/wechat.png)!
 
 <p align="right" style="font-size: 14px; color: #555; margin-top: 20px;">
     <a href="#readme-top" style="text-decoration: none; color: #007bff; font-weight: bold;">
