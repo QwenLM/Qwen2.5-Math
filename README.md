@@ -10,7 +10,7 @@
 
 
 <p align="center">
-        🤗 <a href="">Hugging Face</a>&nbsp&nbsp | &nbsp&nbsp🤖 <a href="https://modelscope.cn/organization/qwen">ModelScope</a>&nbsp&nbsp | &nbsp&nbsp 📑 <a href="https://qwenlm.github.io">Blog</a> &nbsp&nbsp ｜ &nbsp&nbsp📖 <a href="https://qwen.readthedocs.io/">Documentation</a>
+        🤗 <a href="https://huggingface.co/Qwen">Hugging Face</a>&nbsp&nbsp | &nbsp&nbsp🤖 <a href="https://modelscope.cn/organization/qwen">ModelScope</a>&nbsp&nbsp | &nbsp&nbsp 📑 <a href="https://qwenlm.github.io">Blog</a> &nbsp&nbsp ｜ &nbsp&nbsp📖 <a href="https://qwen.readthedocs.io/">Documentation</a>
 <br>
 🖥️ <a href="">Demo</a>&nbsp&nbsp | &nbsp&nbsp💬 <a href="https://github.com/QwenLM/Qwen/blob/main/assets/wechat.png">WeChat (微信)</a>&nbsp&nbsp | &nbsp&nbsp🫨 <a href="https://discord.gg/CV4E9rpNSD">Discord</a>&nbsp&nbsp
 </p>
@@ -21,6 +21,7 @@ Visit our Hugging Face or ModelScope organization (click links above), search ch
 
 ## Introduction
 
+Over the past year, we have dedicated significant effort to researching and enhancing the reasoning capabilities of large language models, with a particular focus on their ability to solve arithmetic and mathematical problems. Today, we are delighted to introduce a serise of math-specific large language models of our Qwen2 series,  Qwen2-Math and Qwen2-Math-Instruct-1.5B/7B/72B. Qwen2-Math is a series of specialized math language models built upon the Qwen2 LLMs, which significantly outperforms the mathematical capabilities of open-source models and even closed-source models (e.g., GPT4o). We hope that Qwen2-Math can contribute to the scientific community for solving advanced mathematical problems that require complex, multi-step logical reasoning.
 
 Detailed performance and introduction are shown in this <a href=""> 📑 blog</a>.
 
@@ -34,25 +35,25 @@ Detailed performance and introduction are shown in this <a href=""> 📑 blog</a
 > </b>
 > </div>
 
-For requirements on GPU memory and the respective throughput, see results [here](https://qwen.readthedocs.io/en/latest/benchmark/speed_benchmark.html).
+For requirements on GPU memory and the respective throughput, see similar results of Qwen2 [here](https://qwen.readthedocs.io/en/latest/benchmark/speed_benchmark.html).
 
 ## Quick Start
 
 > [!Important]
 >
-> **CodeQwen1.5-7B-Chat** is a instruction model for chatting;
+> **Qwen2-Math-72B-Instruct** is a instruction model for chatting;
 >
-> **CodeQwen1.5-7B** is a base model typically used for completion, serving as a better starting point for fine-tuning.
+> **Qwen2-Math-72B** is a base model typically used for completion and few-shot inference, serving as a better starting point for fine-tuning.
 > 
 
 ### 🤗 Hugging Face Transformers
 
-Here we show a code snippet to show you how to use the chat model with `transformers`:
+Qwen2-Math can be deployed and infered in the same way as [Qwen2](https://github.com/QwenLM/Qwen2). Here we show a code snippet to show you how to use the chat model with `transformers`:
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model_name = "Qwen/Qwen2-7B-Instruct"
+model_name = "Qwen/Qwen2-Math-7B-Instruct"
 device = "cuda" # the device to load the model onto
 
 model = AutoModelForCausalLM.from_pretrained(
@@ -85,8 +86,6 @@ generated_ids = [
 response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 ```
 
-For quantized models, we advise you to use the GPTQ and AWQ correspondents, namely `Qwen2-7B-Instruct-GPTQ-Int8`, `Qwen2-7B-Instruct-AWQ`. 
-
 ### 🤖 ModelScope
 We strongly advise users especially those in mainland China to use ModelScope. `snapshot_download` can help you solve issues concerning downloading checkpoints.
 
@@ -96,7 +95,7 @@ We strongly advise users especially those in mainland China to use ModelScope. `
 ## Evaluation
 
 Our evaluation is adapted from [math-evaluation-harness](https://github.com/ZubinGou/math-evaluation-harness).
-You can reproduce results of all instruction models in the Qwen2-Math series with scripts in [evaluation](./evaluation).
+Feel free to reproduce results of all instruction models in the Qwen2-Math series with scripts in [evaluation](./evaluation).
 
 ### Requirements
 
