@@ -16,14 +16,20 @@
 </p>
 
 
-Visit our Hugging Face or ModelScope organization (click the links above). Search checkpoints with names starting with `Qwen2-Math-', and you will find all you need! Enjoy!
+Visit our Hugging Face or ModelScope organization (click the links above). Search checkpoints with names starting with `Qwen2-Math-`, and you will find all you need! Enjoy!
 
 
 ## Introduction
 
-Over the past year, we have dedicated significant effort to researching and enhancing the reasoning capabilities of large language models, with a particular focus on their ability to solve arithmetic and mathematical problems. Today, we are delighted to introduce a series of math-specific large language models of our Qwen2 series, Qwen2-Math, and Qwen2-Math-Instruct-1.5B/7B/72B. Qwen2-Math is a series of specialized math language models built upon the Qwen2 LLMs, which significantly outperforms the mathematical capabilities of open-source models and even closed-source models (e.g., GPT4o). We hope that Qwen2-Math can contribute to the scientific community by solving advanced mathematical problems that require complex, multi-step logical reasoning.
+Over the past year, we have dedicated significant effort to researching and enhancing the reasoning capabilities of large language models, with a particular focus on their ability to solve arithmetic and mathematical problems. Today, we are delighted to introduce a series of math-specific large language models of our Qwen2 series, Qwen2-Math, and Qwen2-Math-Instruct-1.5B/7B/72B. Qwen2-Math is a series of specialized math language models built upon the Qwen2 LLMs, which significantly outperforms the mathematical capabilities of open-source models and even closed-source models (e.g., GPT-4o). We hope that Qwen2-Math can contribute to the scientific community by solving advanced mathematical problems that require complex, multi-step logical reasoning.
 
 Detailed performance and introduction are shown in this <a href="https://qwenlm.github.io/blog/qwen2-math/"> 📑 blog</a>.
+
+> <div align="center">
+> <b>
+> 🚨 This model mainly supports English. We will release bilingual (English and Chinese) math models soon.
+> </b>
+> </div>
 
 ## Requirements
 * `transformers>=4.40.0` for Qwen2-Math models. The latest version is recommended.
@@ -90,12 +96,6 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 We strongly advise users, especially those in mainland China, to use ModelScope. `snapshot_download` can help you solve issues concerning downloading checkpoints.
 
 ## Performance
-
-> <div align="center">
-> <b>
-> 🚨 This model mainly supports English. We will release bilingual (English and Chinese) math models soon.
-> </b>
-> </div>
 
 We evaluate our math-specific models on a series of math benchmarks. The results below demonstrate that our largest math-specific model Qwen2-Math-72B-Instruct outperforms the state-of-the-art models, including GPT-4o, Claude-3.5-Sonnet, Gemini-1.5-Pro, Llama-3.1-405B.
 
