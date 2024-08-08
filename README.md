@@ -16,12 +16,12 @@
 </p>
 
 
-Visit our Hugging Face or ModelScope organization (click links above), search checkpoints with names starting with `Qwen2-Math-`, and you will find all you need! Enjoy!
+Visit our Hugging Face or ModelScope organization (click the links above). Search checkpoints with names starting with `Qwen2-Math—', and you will find all you need! Enjoy!
 
 
 ## Introduction
 
-Over the past year, we have dedicated significant effort to researching and enhancing the reasoning capabilities of large language models, with a particular focus on their ability to solve arithmetic and mathematical problems. Today, we are delighted to introduce a serise of math-specific large language models of our Qwen2 series,  Qwen2-Math and Qwen2-Math-Instruct-1.5B/7B/72B. Qwen2-Math is a series of specialized math language models built upon the Qwen2 LLMs, which significantly outperforms the mathematical capabilities of open-source models and even closed-source models (e.g., GPT4o). We hope that Qwen2-Math can contribute to the scientific community for solving advanced mathematical problems that require complex, multi-step logical reasoning.
+Over the past year, we have dedicated significant effort to researching and enhancing the reasoning capabilities of large language models, with a particular focus on their ability to solve arithmetic and mathematical problems. Today, we are delighted to introduce a series of math-specific large language models of our Qwen2 series, Qwen2-Math, and Qwen2-Math-Instruct-1.5B/7B/72B. Qwen2-Math is a series of specialized math language models built upon the Qwen2 LLMs, which significantly outperforms the mathematical capabilities of open-source models and even closed-source models (e.g., GPT4o). We hope that Qwen2-Math can contribute to the scientific community by solving advanced mathematical problems that require complex, multi-step logical reasoning.
 
 Detailed performance and introduction are shown in this <a href=""> 📑 blog</a>.
 
@@ -41,14 +41,14 @@ For requirements on GPU memory and the respective throughput, see similar result
 
 > [!Important]
 >
-> **Qwen2-Math-72B-Instruct** is a instruction model for chatting;
+> **Qwen2-Math-72B-Instruct** is an instruction model for chatting;
 >
 > **Qwen2-Math-72B** is a base model typically used for completion and few-shot inference, serving as a better starting point for fine-tuning.
 > 
 
 ### 🤗 Hugging Face Transformers
 
-Qwen2-Math can be deployed and infered in the same way as [Qwen2](https://github.com/QwenLM/Qwen2). Here we show a code snippet to show you how to use the chat model with `transformers`:
+Qwen2-Math can be deployed and inferred in the same way as [Qwen2](https://github.com/QwenLM/Qwen2). Here we show a code snippet to show you how to use the chat model with `transformers`:
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
