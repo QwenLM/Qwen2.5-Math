@@ -16,7 +16,7 @@
 </p>
 
 
-Visit our Hugging Face or ModelScope organization (click the links above). Search checkpoints with names starting with `Qwen2-Math—', and you will find all you need! Enjoy!
+Visit our Hugging Face or ModelScope organization (click the links above). Search checkpoints with names starting with `Qwen2-Math-', and you will find all you need! Enjoy!
 
 
 ## Introduction
