@@ -63,7 +63,7 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-prompt = "Carlos is planting a lemon tree. The tree will cost $90 to plant. Each year it will grow 7 lemons, which he can sell for $1.5 each. It costs $3 a year to water and feed the tree. How many years will it take before he starts earning money on the lemon tree?"
+prompt = "Find the value of $x$ that satisfies the equation $4x+5 = 6x+7$."
 messages = [
     {"role": "system", "content": "You are a helpful assistant."},
     {"role": "user", "content": prompt}
