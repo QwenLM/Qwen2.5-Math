@@ -113,7 +113,7 @@ We report greedy, Maj@8, and RM@8 performance on all benchmarks in the zero-shot
     <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/Instruct-Table1.png" width="800"/>
 <p>
 
-In more complex mathematical competition evaluations such as AIME 2024 and AMC 2023, Qwen2-Math-Instruct also performs well across various settings, including greedy, Maj@64, RM@64, and RM@256.
+In more complex mathematical competition evaluations such as AIME 2024 and AMC 2023, Qwen2-Math-Instruct also performs well across various settings, including `greedy`, `Maj@64`, `RM@64`, and `RM@256`.
 
 <p align="center">
     <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/Instruct-Table2.png" width="500"/>
