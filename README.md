@@ -105,11 +105,15 @@ We evaluate our Qwen2-Math-Base models on three widely used English math benchma
     <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/Base-Table1.png" width="800"/>
 <p>
 
-We evaluate Qwen2-Math-Instruct on mathematical benchmarks in both English and Chinese. In addition to the widely-used benchmarks, such as GSM8K and Math, we also involve more exams that are much challenging to fully inspect the capabilities of Qwen2-Math-Instruct, such as OlympiadBench, CollegeMath, GaoKao, AIME2024, and AMC2023. For Chinese mathematical benchmarks, we use CMATH, Gaokao (Chinese college entrance examination 2024), and CN Middle School 24 (China High School Entrance Examination 2024). We report greedy and RM@8 performance on all benchmarks in the zero-shot setting, except for the multi-choice benchmark with a few-shot setting, such as MMLU (STEM), and some multi-choice questions in GaoKao and CN Middle School 24.
+We evaluate Qwen2-Math-Instruct on mathematical benchmarks in both English and Chinese. In addition to the widely-used benchmarks, such as GSM8K and Math, we also involve more exams that are much challenging to fully inspect the capabilities of Qwen2-Math-Instruct, such as OlympiadBench, CollegeMath, GaoKao, AIME2024, and AMC2023. For Chinese mathematical benchmarks, we use CMATH, Gaokao (Chinese college entrance examination 2024), and CN Middle School 24 (China High School Entrance Examination 2024). 
+
+We report greedy, Maj@8, and RM@8 performance on all benchmarks in the zero-shot setting, except for the multi-choice benchmarks (including MMLU STEM and multiple-choice problems in GaoKao and CN Middle School 24) with a 5-shot setting. Qwen2-Math-Instruct achieves the best performance among models of the same size, with RM@8 outperforming Maj@8, particularly in the 1.5B and 7B models. This demonstrates the effectiveness of our Math Reward Model.
 
 <p align="center">
     <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/Instruct-Table1.png" width="800"/>
 <p>
+
+In more complex mathematical competition evaluations such as AIME 2024 and AMC 2023, Qwen2-Math-Instruct also performs well across various settings, including greedy, Maj@64, RM@64, and RM@256.
 
 <p align="center">
     <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/Instruct-Table2.png" width="800"/>
