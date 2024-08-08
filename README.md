@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 
 <p align="center">
-    <img src="https://qianwen-res.oss-accelerate-overseas.aliyuncs.com/assets/blog/codeqwen1.5/codeqwen_logo_final.png" width="400"/>
+    <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/qwen2math_logo.png" width="400"/>
 <p>
 
 <p align="center">
