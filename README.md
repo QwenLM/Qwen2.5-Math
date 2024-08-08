@@ -5,7 +5,7 @@
 <p>
 
 <p align="center">
-    <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/fig1.jpg" width="800"/>
+    <img src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/assets/blog/qwen2-math/fig1_nologo.jpg" width="800"/>
 <p>
 
 
