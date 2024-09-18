@@ -62,7 +62,7 @@ Qwen2.5-Math can be deployed and inferred in the same way as [Qwen2.5](https://g
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model_name = "Qwen/Qwen2.5-Math-7B-Instruct"
+model_name = "Qwen/Qwen2.5-Math-72B-Instruct"
 device = "cuda" # the device to load the model onto
 
 model = AutoModelForCausalLM.from_pretrained(
@@ -73,10 +73,19 @@ model = AutoModelForCausalLM.from_pretrained(
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 prompt = "Find the value of $x$ that satisfies the equation $4x+5 = 6x+7$."
+
+# CoT
 messages = [
-    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "system", "content": "Please reason step by step, and put your final answer within \\boxed{}."},
     {"role": "user", "content": prompt}
 ]
+
+# TIR
+messages = [
+    {"role": "system", "content": "Please integrate natural language reasoning with programs to solve the problem above, and put your final answer within \\boxed{}."},
+    {"role": "user", "content": prompt}
+]
+
 text = tokenizer.apply_chat_template(
     messages,
     tokenize=False,
@@ -95,8 +104,53 @@ generated_ids = [
 response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 ```
 
+This time, we also released a mathematical reward model, [Qwen2.5-Math-RM-72B](https://huggingface.co/Qwen/Qwen2.5-Math-RM-72B), based on Qwen2.5-Math-72B-Instruct. Qwen2.5-Math-RM-72B can be easily infered with HuggingFace Transformers with `trust_remote_code`.
+
+```python
+import torch
+from transformers import AutoModel, AutoTokenizer
+
+model_name = "Qwen/Qwen2.5-Math-RM-72B"
+device = "auto" # the device to load the model onto
+
+model = AutoModel.from_pretrained(
+    model_name, 
+    device_map=device, 
+    torch_dtype=torch.bfloat16,
+    trust_remote_code=True,
+).eval()
+
+tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+
+chat = [
+    {"role": "system", "content": "Please reason step by step, and put your final answer within \\boxed{}."},
+    {"role": "user", "content": "Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?"},
+    {"role": "assistant", "content": "To determine how much Janet makes from selling the duck eggs at the farmers' market, we need to follow these steps:\n\n1. Calculate the total number of eggs laid by the ducks each day.\n2. Determine how many eggs Janet eats and bakes for herself each day.\n3. Find out how many eggs are left to be sold.\n4. Calculate the revenue from selling the remaining eggs at $2 per egg.\n\nLet's start with the first step:\n\n1. Janet's ducks lay 16 eggs per day.\n\nNext, we calculate how many eggs Janet eats and bakes for herself each day:\n\n2. Janet eats 3 eggs for breakfast every morning.\n3. Janet bakes 4 eggs for her friends every day.\n\nSo, the total number of eggs Janet eats and bakes for herself each day is:\n\\[ 3 + 4 = 7 \\text{ eggs} \\]\n\nNow, we find out how many eggs are left to be sold:\n\\[ 16 - 7 = 9 \\text{ eggs} \\]\n\nFinally, we calculate the revenue from selling the remaining eggs at $2 per egg:\n\\[ 9 \\times 2 = 18 \\text{ dollars} \\]\n\nTherefore, Janet makes \\boxed{18} dollars every day at the farmers' market."}
+] # 3.75
+
+conversation_str = tokenizer.apply_chat_template(
+    chat, 
+    tokenize=False, 
+    add_generation_prompt=False
+)
+
+input_ids = tokenizer.encode(
+    conversation_str, 
+    return_tensors="pt", 
+    add_special_tokens=False
+).to(model.device)
+
+outputs = model(input_ids=input_ids)
+print(outputs[0])
+
+```
+
 ### 🤖 ModelScope
 We strongly advise users, especially those in mainland China, to use ModelScope. `snapshot_download` can help you solve issues concerning downloading checkpoints.
+
+### Local Demo (Qwen-Agent)
+
+We developed a demo that supports the TIR mode in [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent), which allows running code locally to experience Tool-Integrated Reasoning capabilities of Qwen2.5-Math.
 
 ## Performance
 
