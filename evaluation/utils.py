@@ -138,6 +138,13 @@ PROMPT_TEMPLATES = {
         "{output}",
         "\n\n",
     ),
+    "qwen25-math-cot": (
+        "<|im_start|>system\nPlease reason step by step, and put your final answer within \\boxed{{}}.<|im_end|>\n"
+        "<|im_start|>user\n{input}<|im_end|>\n"
+        "<|im_start|>assistant\n",
+        "{output}",
+        "\n\n",
+    ),
     "mathstral": (
         "{input}\nPlease reason step by step, and put your final answer within \\boxed{{}}.",
         "{output}",
@@ -183,19 +190,28 @@ def construct_prompt(example, data_name, args):
         prompt_temp[1],
         prompt_temp[2],
     )
-    demo_prompt = splitter.join(
-        [
-            input_template.format(input=q) + output_template.format(output=a)
-            for q, a in demos
-        ]
-    )
+    if args.prompt_type == "qwen25-math-cot":
+        # Hotfix to support putting all demos into a single turn
+        demo_prompt = splitter.join([q + "\n" + a for q, a in demos])
+    else:
+        demo_prompt = splitter.join(
+            [
+                input_template.format(input=q) + output_template.format(output=a)
+                for q, a in demos
+            ]
+        )
     context = input_template.format(input=example["question"])
     if len(demo_prompt) == 0 or (
         args.adapt_few_shot and example["gt_ans"] not in ["A", "B", "C", "D", "E"]
     ):
         full_prompt = context
     else:
-        full_prompt = demo_prompt + splitter + context
+        if args.prompt_type == "qwen25-math-cot":
+            # Hotfix to supportting put all demos into a single turn
+            full_prompt = demo_prompt + splitter + example["question"]
+            full_prompt = input_template.format(input=full_prompt)
+        else:
+            full_prompt = demo_prompt + splitter + context
 
     if args.prompt_type == "platypus_fs":
         full_prompt_temp = (
