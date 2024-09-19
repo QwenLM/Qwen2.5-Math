@@ -225,7 +225,7 @@ Strictly following the versions of requirements is essential to reproduce the re
 Evaluate Qwen2.5-Math-Instruct series model with the following command:
 
 ```bash
-PROMPT_TYPE="qwen-boxed"
+PROMPT_TYPE="qwen25-math-cot"
 
 # Qwen2.5-Math-1.5B-Instruct
 export CUDA_VISIBLE_DEVICES="0"
