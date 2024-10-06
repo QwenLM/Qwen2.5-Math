@@ -15,6 +15,10 @@
 <a href="https://github.com/QwenLM/Qwen/blob/main/assets/wechat.png">WeChat (微信)</a>&nbsp&nbsp | &nbsp&nbsp🫨 <a href="https://discord.gg/CV4E9rpNSD">Discord</a>&nbsp&nbsp
 </p>
 
+> [!NOTE]
+> This fork includes tighter integration with the Hugging Face Hub, so that we can evaluate the predictions from models generated with algorithms like MCTS.
+
+
 
 Visit our Hugging Face or ModelScope organization (click the links above). Search checkpoints with names starting with `Qwen2.5-Math-`, and you will find all you need! Enjoy!
 
@@ -210,12 +214,12 @@ Feel free to reproduce the results of all instruction models in the Qwen2.5-Math
 Before the evaluation, please install the required packages with the following command:
 
 ```bash
-cd latex2sympy
+cd evaluation/latex2sympy
 pip install -e .
 cd ..
-pip install -r requirements.txt 
 pip install vllm==0.5.1 --no-build-isolation
-pip install transformers=4.42.3
+pip install -r requirements.txt 
+pip install transformers==4.42.3
 ```
 
 Strictly following the versions of requirements is essential to reproduce the reported scores.
