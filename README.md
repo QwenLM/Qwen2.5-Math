@@ -16,9 +16,18 @@
 </p>
 
 > [!NOTE]
-> This fork includes tighter integration with the Hugging Face Hub, so that we can evaluate the predictions from models generated with algorithms like MCTS.
+> This fork includes tighter integration with the Hugging Face Hub, so that we can evaluate the predictions from models generated with `optillm` and algorithms like MCTS.
 
+## Evaluate model outputs from optillm
 
+To evaluate model outputs from `optillm` first follow the installation examples below and then run:
+
+```shell
+python evaluation/evaluate.py \
+    --benchmark math \
+    --dataset_id reliable-agents/Llama-3.1-8B-Instruct-optillm-completions \
+    --dataset_split test
+```
 
 Visit our Hugging Face or ModelScope organization (click the links above). Search checkpoints with names starting with `Qwen2.5-Math-`, and you will find all you need! Enjoy!
 
