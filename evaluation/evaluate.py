@@ -119,7 +119,6 @@ def evaluate(benchmark: str, dataset_id: str, dataset_config: str = None, datase
     timeout_cnt = 0 
 
     with ProcessPool(max_workers=8) as pool:
-        print("Starting evaluation")
         future = pool.map(math_equal_process, params, timeout=3)
         iterator = future.result()
         with tqdm(total=len(samples), desc="Evaluate") as progress_bar:
