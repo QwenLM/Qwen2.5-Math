@@ -103,11 +103,6 @@ def evaluate(benchmark: str, dataset_id: str, dataset_config: str = None, datase
         print(f"max_num_samples: {max_num_samples} / {len(samples)}")
         samples = samples[:max_num_samples]
 
-    # extract pred from optillm output
-    # should probably store this in the dataset itself
-    if "pred" not in samples.column_names and "optillm_completions" in samples.column_names:
-        samples = samples.map(lambda x: {"pred": x['optillm_completions'][0]['content']})
-
 
     def parse_gt(x):
         x['gt_cot'], x['gt'] = parse_ground_truth(x, benchmark)
