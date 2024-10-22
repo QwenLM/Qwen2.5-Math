@@ -582,7 +582,7 @@ def extract_answer_map(x, data_name, use_last_number=True):
     elif "boxed" in pred_str:
         ans = pred_str.split("boxed")[-1]
         if len(ans) == 0:
-            return ""
+            a = ""
         elif ans[0] == "{":
             stack = 1
             a = ""
