@@ -107,7 +107,8 @@ def evaluate(benchmark: str, dataset_id: str, dataset_config: str = None, datase
     def parse_gt(x):
         x['gt_cot'], x['gt'] = parse_ground_truth(x, benchmark)
         return x
-    samples = samples.map(parse_gt, desc="Parsing ground truth", num_proc=4)
+    samples = samples.map(parse_gt, desc="Parsing ground truth", num_proc=4, load_from_cache_file=False)
+    samples = samples.map(extract_answer_map, fn_kwargs={"data_name": benchmark}, desc="Parsing predictions", num_proc=4, load_from_cache_file=False)
     params = [(idx, pred, gt) for idx, pred, gt in zip(samples['idx'], samples['pred'], samples['gt'])]
 
     scores = []
