@@ -94,7 +94,7 @@ from python_executor import PythonExecutor
 #     print(result_json)
 #     return samples, result_json
 
-def evaluate(benchmark: str, dataset_id: str, dataset_config: str = None, dataset_split: str = "test", samples: list=None, max_num_samples=None):
+def evaluate(benchmark: str, dataset_id: str, dataset_config: str = None, dataset_split: str = "test", dataset_col: str = "pred", samples: list=None, max_num_samples=None):
     samples = load_dataset(dataset_id, name=dataset_config, split=dataset_split)
     if "idx" not in samples.column_names:
         samples = samples.map(lambda x, idx: {"idx": idx}, with_indices=True)
@@ -108,7 +108,7 @@ def evaluate(benchmark: str, dataset_id: str, dataset_config: str = None, datase
         x['gt_cot'], x['gt'] = parse_ground_truth(x, benchmark)
         return x
     samples = samples.map(parse_gt, desc="Parsing ground truth", num_proc=4, load_from_cache_file=False)
-    samples = samples.map(extract_answer_map, fn_kwargs={"data_name": benchmark}, desc="Parsing predictions", num_proc=4, load_from_cache_file=False)
+    samples = samples.map(extract_answer_map, fn_kwargs={"data_name": benchmark, "col": dataset_col}, desc="Parsing predictions", num_proc=4, load_from_cache_file=False)
     params = [(idx, pred, gt) for idx, pred, gt in zip(samples['idx'], samples['pred'], samples['gt'])]
 
     scores = []
@@ -151,11 +151,12 @@ def parse_args():
     parser.add_argument("--dataset_id", type=str, required=True)
     parser.add_argument("--dataset_config", type=str, default=None)
     parser.add_argument("--dataset_split", type=str, default="test")
+    parser.add_argument("--dataset_col", type=str, default="pred")
     parser.add_argument("--max_num_samples", type=int, default=None)
     args = parser.parse_args()
     return args
 
 if __name__ == "__main__":
     args = parse_args()
-    evaluate(benchmark=args.benchmark, dataset_id=args.dataset_id, dataset_config=args.dataset_config, dataset_split=args.dataset_split,
+    evaluate(benchmark=args.benchmark, dataset_id=args.dataset_id, dataset_config=args.dataset_config, dataset_split=args.dataset_split, dataset_col=args.dataset_col,
              max_num_samples=args.max_num_samples)
