@@ -568,8 +568,8 @@ def extract_answer(pred_str, data_name, use_last_number=True):
     pred = strip_string(pred, skip_unit=data_name in ["carp_en", "minerva_math"])
     return pred
 
-def extract_answer_map(x, data_name, use_last_number=True):
-    pred_str = x["pred"]
+def extract_answer_map(x, data_name, col = "pred", use_last_number=True):
+    pred_str = x[col]
     pred_str = pred_str.replace("\u043a\u0438", "")
     if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023"]:
         # TODO check multiple choice
