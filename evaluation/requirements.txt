@@ -13,3 +13,8 @@ antlr4-python3-runtime==4.11.1 # ! The version needs to be compatible with sympy
 word2number
 Pebble
 timeout-decorator
+
+# For SGLang and FlashInfer
+pip install "sglang[all]"
+# reference: https://flashinfer.ai/docs/installation/ to install the proper version of FlashInfer according to your environment.
+pip install flashinfer -i https://flashinfer.ai/whl/cu121/torch2.4/
