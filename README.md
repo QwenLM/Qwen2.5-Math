@@ -106,6 +106,10 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
 This time, we also released a mathematical reward model, [Qwen2.5-Math-RM-72B](https://huggingface.co/Qwen/Qwen2.5-Math-RM-72B), based on Qwen2.5-Math-72B-Instruct. Qwen2.5-Math-RM-72B can be easily infered with HuggingFace Transformers with `trust_remote_code`.
 
+> [!Warning]
+> 
+> We use `temperature=0.7` and `top_p=0.8` for maj@8 and RM@8 sampling with **Qwen2.5-Math-Instruct**, while `temperature=1.0` and `top_p=0.9` with **Qwen2-Math-Instruct**.
+> 
 ```python
 import torch
 from transformers import AutoModel, AutoTokenizer
