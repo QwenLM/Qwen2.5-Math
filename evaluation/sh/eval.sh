@@ -2,7 +2,9 @@ set -ex
 
 PROMPT_TYPE=$1
 MODEL_NAME_OR_PATH=$2
-OUTPUT_DIR=${MODEL_NAME_OR_PATH}/math_eval
+OUTPUT_DIR=${MODEL_NAME_OR_PATH}/$3
+ENGINE_TYPE=$4
+
 
 SPLIT="test"
 NUM_TEST_SAMPLE=-1
@@ -23,7 +25,9 @@ python3 -u math_eval.py \
     --top_p 1 \
     --start 0 \
     --end -1 \
-    --use_vllm \
+    --mem_fraction_static 0.65 \
+    --use_serving_engine \
+    --engine_type ${ENGINE_TYPE} \
     --save_outputs \
     --overwrite \
 
@@ -43,7 +47,9 @@ python3 -u math_eval.py \
     --top_p 1 \
     --start 0 \
     --end -1 \
-    --use_vllm \
+    --mem_fraction_static 0.65 \
+    --use_serving_engine \
+    --engine_type ${ENGINE_TYPE} \
     --save_outputs \
     --overwrite \
     --num_shots 5
@@ -64,7 +70,9 @@ python3 -u math_eval.py \
     --top_p 1 \
     --start 0 \
     --end -1 \
-    --use_vllm \
+    --mem_fraction_static 0.65 \
+    --use_serving_engine \
+    --engine_type ${ENGINE_TYPE} \
     --save_outputs \
     --overwrite \
     --adapt_few_shot
@@ -85,7 +93,9 @@ python3 -u math_eval.py \
     --top_p 1 \
     --start 0 \
     --end -1 \
-    --use_vllm \
+    --mem_fraction_static 0.65 \
+    --use_serving_engine \
+    --engine_type ${ENGINE_TYPE} \
     --save_outputs \
     --overwrite \
     --adapt_few_shot
@@ -107,6 +117,8 @@ python3 -u math_eval.py \
     --top_p 1 \
     --start 0 \
     --end -1 \
-    --use_vllm \
+    --mem_fraction_static 0.65 \
+    --use_serving_engine \
+    --engine_type ${ENGINE_TYPE} \
     --save_outputs \
     --overwrite \

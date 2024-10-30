@@ -546,10 +546,7 @@ def extract_answer(pred_str, data_name, use_last_number=True):
             pred = ""
 
     # choice answer
-    if (
-        data_name in ["sat_math", "aqua"]
-        or "mmlu" in data_name
-    ):
+    if data_name in ["sat_math", "aqua"] or "mmlu" in data_name:
         tmp = re.findall(r"\b(A|B|C|D|E)\b", pred.upper())
         if tmp:
             pred = tmp[-1]
