@@ -30,6 +30,31 @@ python evaluation/evaluate.py \
     --dataset_split train
 ```
 
+By default the script computed accuracy on the `pred` column. To compute accuracy on a different column, pass `--dataset_col` as follows:
+
+```shell
+python evaluation/evaluate.py \
+    --benchmark math \
+    --dataset_id reliable-agents/Qwen2.5-Math-1.5B-Instruct-bon-completions \
+    --dataset_config reliable-agents_MATH-500--agg_strategy-last--T-1.0--n-256--weighted_bon--agg_strategy-last \
+    --dataset_split train \
+    --dataset_col pred_weighted_bon@1
+```
+
+For Best-of-N, you can evaluate all values of `n` for a given config by running:
+
+```shell
+python evaluation/evaluate_bon.py \
+    --benchmark math \
+    --dataset_id reliable-agents/Qwen2.5-Math-1.5B-Instruct-bon-completions \
+    --dataset_config reliable-agents_MATH-500--agg_strategy-last--T-1.0--n-256--weighted_bon--agg_strategy-last \
+    --dataset_split train \
+    --voting_n 1 2 4 8 16 32 64 128 256
+```
+
+
+## Original README follows
+
 Visit our Hugging Face or ModelScope organization (click the links above). Search checkpoints with names starting with `Qwen2.5-Math-`, and you will find all you need! Enjoy!
 
 
