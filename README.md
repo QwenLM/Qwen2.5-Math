@@ -26,7 +26,7 @@ To evaluate model outputs first follow the installation examples below and then 
 python evaluation/evaluate.py \
     --benchmark math \
     --dataset_id reliable-agents/Qwen2.5-Math-1.5B-Instruct-bon-completions \
-    --dataset_config lighteval_MATH--agg_strategy-min--T-1.0--n-32 \
+    --dataset_config lighteval_MATH--agg_strategy-min--T-1.0--n-256 \
     --dataset_split train
 ```
 
@@ -36,9 +36,9 @@ By default the script computed accuracy on the `pred` column. To compute accurac
 python evaluation/evaluate.py \
     --benchmark math \
     --dataset_id reliable-agents/Qwen2.5-Math-1.5B-Instruct-bon-completions \
-    --dataset_config reliable-agents_MATH-500--agg_strategy-last--T-1.0--n-256--weighted_bon--agg_strategy-last \
+    --dataset_config reliable-agents_MATH-500--agg_strategy-last--T-1.0--n-256 \
     --dataset_split train \
-    --dataset_col pred_weighted_bon@1
+    --dataset_col pred_weighted@1
 ```
 
 For Best-of-N, you can evaluate all values of `n` for a given config by running:
@@ -47,7 +47,7 @@ For Best-of-N, you can evaluate all values of `n` for a given config by running:
 python evaluation/evaluate_bon.py \
     --benchmark math \
     --dataset_id reliable-agents/Qwen2.5-Math-1.5B-Instruct-bon-completions \
-    --dataset_config reliable-agents_MATH-500--agg_strategy-last--T-1.0--n-256--weighted_bon--agg_strategy-last \
+    --dataset_config reliable-agents_MATH-500--agg_strategy-last--T-1.0--n-256 \
     --dataset_split train \
     --voting_n 1 2 4 8 16 32 64 128 256
 ```
