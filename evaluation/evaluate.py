@@ -96,6 +96,11 @@ from python_executor import PythonExecutor
 
 def evaluate(benchmark: str, dataset_id: str, dataset_config: str = None, dataset_split: str = "test", dataset_col: str = "pred", samples: list=None, max_num_samples=None):
     samples = load_dataset(dataset_id, name=dataset_config, split=dataset_split)
+
+    # Sanity check we have unique number of MATH problems
+    if benchmark == "math" and len(samples.unique("problem")) != len(samples):
+        raise ValueError(f"Dataset contains duplicate math problems. Found {len(samples.unique('problem'))} unique problems out of {len(samples)} samples")
+
     if "idx" not in samples.column_names:
         samples = samples.map(lambda x, idx: {"idx": idx}, with_indices=True)
         
