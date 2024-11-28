@@ -219,7 +219,7 @@ pip install -e .
 cd ..
 pip install -r requirements.txt 
 pip install vllm==0.5.1 --no-build-isolation
-pip install transformers=4.42.3
+pip install transformers==4.42.3
 ```
 
 Strictly following the versions of requirements is essential to reproduce the reported scores.
