@@ -7,6 +7,7 @@ from datasets import load_dataset
 from tqdm.auto import tqdm
 import pandas as pd
 from datasets import Dataset
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from grader import *
 
@@ -79,13 +80,36 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     data = {"n": [], "acc_naive": [], "acc_weighted": [], "acc_maj": []}
-    for n in tqdm(args.voting_n, desc=f"Applying voting..."):
-        data["n"].append(n)
-        for agg in ["naive", "weighted", "maj"]:
-            _, scores = evaluate(benchmark=args.benchmark, dataset_id=args.dataset_id, dataset_config=args.dataset_config, dataset_split=args.dataset_split, dataset_col=f"pred_{agg}@{n}",
-                    max_num_samples=args.max_num_samples)
-            data[f"acc_{agg}"].append(scores["acc"])
 
+    def evaluate_for_n(n):
+        local_data = {"n": n, "acc_naive": None, "acc_weighted": None, "acc_maj": None}
+        for agg in ["naive", "weighted", "maj"]:
+            _, scores = evaluate(
+                benchmark=args.benchmark,
+                dataset_id=args.dataset_id,
+                dataset_config=args.dataset_config,
+                dataset_split=args.dataset_split,
+                dataset_col=f"pred_{agg}@{n}",
+                max_num_samples=args.max_num_samples,
+            )
+            local_data[f"acc_{agg}"] = scores["acc"]
+        return local_data
+
+    with ProcessPoolExecutor() as executor:
+        futures = {executor.submit(evaluate_for_n, n): n for n in args.voting_n}
+        with tqdm(total=len(futures), desc="Evaluating voting_n") as progress_bar:
+            for future in as_completed(futures):
+                try:
+                    result = future.result()
+                    data["n"].append(result["n"])
+                    data["acc_naive"].append(result["acc_naive"])
+                    data["acc_weighted"].append(result["acc_weighted"])
+                    data["acc_maj"].append(result["acc_maj"])
+                except Exception as e:
+                    print(f"Error processing n={futures[future]}: {e}")
+                progress_bar.update(1)
+
+    # Save results
     ds = Dataset.from_dict(data)
     url = ds.push_to_hub(args.dataset_id, config_name=f"{args.dataset_config}--evals")
     print(f"Results saved to {url}")
