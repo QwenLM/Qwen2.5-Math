@@ -18,6 +18,8 @@ from sympy.parsing.sympy_parser import parse_expr
 from sympy.parsing.latex import parse_latex
 from latex2sympy2 import latex2sympy
 
+import unittest
+
 # from .parser import choice_answer_clean, strip_string
 # from parser import choice_answer_clean
 
@@ -70,6 +72,142 @@ def str_to_pmatrix(input_str):
     return ", ".join(pmatrix_list)
 
 
+def is_numerical_equal(prediction, reference, include_percentage, is_close):
+    if is_digit(prediction) and is_digit(reference):
+        prediction = parse_digits(prediction)
+        reference = parse_digits(reference)
+        if include_percentage:
+            gt_result = [reference / 100, reference, reference * 100]
+        else:
+            gt_result = [reference]
+        for item in gt_result:
+            try:
+                if is_close:
+                    if numeric_equal(prediction, item):
+                        return True
+                else:
+                    if item == prediction:
+                        return True
+            except Exception:
+                continue
+    return False
+
+
+def process_matrix(prediction, reference):
+    if "pmatrix" in prediction and "pmatrix" not in reference:
+        reference = str_to_pmatrix(reference)
+    return prediction, reference
+
+
+def has_format(s, start_char, end_char):
+    return s.startswith(start_char) and s.endswith(end_char)
+
+
+def remove_brackets(s, brackets):
+    for bracket in brackets:
+        s = s.replace(bracket, "")
+    return s
+
+
+def is_list_format(s):
+    return regex.match(r"(\(|\[).+(\)|\])", s) is not None
+
+
+def is_matrix_format(s):
+    return (
+        (s.startswith("\\begin{pmatrix}") or s.startswith("\\begin{bmatrix}"))
+        and (s.endswith("\\end{pmatrix}") or s.endswith("\\end{bmatrix}"))
+    )
+
+
+def compare_lists(prediction, reference, include_percentage, is_close):
+    pred_parts = prediction[1:-1].split(",")
+    ref_parts = reference[1:-1].split(",")
+    if len(pred_parts) == len(ref_parts):
+        return all(
+            math_equal(pred_parts[i], ref_parts[i], include_percentage, is_close)
+            for i in range(len(pred_parts))
+        )
+    return False
+
+
+def compare_matrices(prediction, reference, include_percentage, is_close):
+    pred_lines = [
+        line.strip()
+        for line in prediction[
+            len("\\begin{pmatrix}") : -len("\\end{pmatrix}")
+        ].split("\\\\")
+        if line.strip()
+    ]
+    ref_lines = [
+        line.strip()
+        for line in reference[
+            len("\\begin{pmatrix}") : -len("\\end{pmatrix}")
+        ].split("\\\\")
+        if line.strip()
+    ]
+    if len(pred_lines) == len(ref_lines):
+        for pred_line, ref_line in zip(pred_lines, ref_lines):
+            pred_parts = pred_line.split("&")
+            ref_parts = ref_line.split("&")
+            if len(pred_parts) != len(ref_parts):
+                return False
+            if not all(
+                math_equal(pred_parts[i], ref_parts[i], include_percentage, is_close)
+                for i in range(len(pred_parts))
+            ):
+                return False
+        return True
+    return False
+
+
+def compare_structures(prediction, reference, include_percentage, is_close):
+    if is_list_format(prediction) and is_list_format(reference):
+        return compare_lists(prediction, reference, include_percentage, is_close)
+
+    if is_matrix_format(prediction) and is_matrix_format(reference):
+        return compare_matrices(prediction, reference, include_percentage, is_close)
+
+    return False
+
+
+def format_equation(equation: str) -> str:
+    parts = equation.split("=")
+    return f"{parts[0].strip()} - ({parts[1].strip()})"
+
+
+def check_symbolic_equality(prediction: str, reference: str) -> bool:
+    pred = format_equation(prediction)
+    ref = format_equation(reference)
+    return symbolic_equal(pred, ref) or symbolic_equal(f"-({pred})", ref)
+
+
+def check_math_equality(
+    prediction: str, reference: str, include_percentage: bool, is_close: bool
+) -> bool:
+    return math_equal(prediction, reference, include_percentage, is_close)
+
+
+def is_simple_equation(equation: str) -> bool:
+    return equation.count("=") == 1 and len(equation.split("=")[0].strip()) <= 2
+
+
+def compare_equations(
+    prediction: str, reference: str, include_percentage: bool, is_close: bool
+) -> bool:
+    if prediction.count("=") == 1 and reference.count("=") == 1:
+        return check_symbolic_equality(prediction, reference)
+    elif is_simple_equation(prediction) and "=" not in reference:
+        return check_math_equality(
+            prediction.split("=")[1], reference, include_percentage, is_close
+        )
+    elif is_simple_equation(reference) and "=" not in prediction:
+        return check_math_equality(
+            prediction, reference.split("=")[1], include_percentage, is_close
+        )
+    return False
+
+
 def math_equal(
     prediction: Union[bool, float, str],
     reference: Union[float, str],
@@ -93,28 +231,8 @@ def math_equal(
     ):
         return True
 
-    try:  # 1. numerical equal
-        if is_digit(prediction) and is_digit(reference):
-            prediction = parse_digits(prediction)
-            reference = parse_digits(reference)
-            # number questions
-            if include_percentage:
-                gt_result = [reference / 100, reference, reference * 100]
-            else:
-                gt_result = [reference]
-            for item in gt_result:
-                try:
-                    if is_close:
-                        if numeric_equal(prediction, item):
-                            return True
-                    else:
-                        if item == prediction:
-                            return True
-                except Exception:
-                    continue
-            return False
-    except:
-        pass
+    if is_numerical_equal(prediction, reference, include_percentage, is_close):
+        return True
 
     if not prediction and prediction not in [0, False]:
         return False
@@ -124,129 +242,39 @@ def math_equal(
     prediction = str(prediction).strip()
 
     ## pmatrix (amps)
-    if "pmatrix" in prediction and not "pmatrix" in reference:
-        reference = str_to_pmatrix(reference)
+    prediction, reference = process_matrix(prediction, reference)
 
     ## deal with [], (), {}
     pred_str, ref_str = prediction, reference
-    if (
-        prediction.startswith("[")
-        and prediction.endswith("]")
-        and not reference.startswith("(")
-    ) or (
-        prediction.startswith("(")
-        and prediction.endswith(")")
-        and not reference.startswith("[")
+    if (has_format(pred_str, "[", "]") and not has_format(ref_str, "(", ")")) or (
+        has_format(pred_str, "(", ")") and not has_format(ref_str, "[", "]")
     ):
         pred_str = pred_str.strip("[]()")
         ref_str = ref_str.strip("[]()")
-    for s in ["{", "}", "(", ")"]:
-        ref_str = ref_str.replace(s, "")
-        pred_str = pred_str.replace(s, "")
+    brackets_to_remove = ["{", "}", "(", ")"]
+    pred_str = remove_brackets(pred_str, brackets_to_remove)
+    ref_str = remove_brackets(ref_str, brackets_to_remove)
+
     if pred_str.lower() == ref_str.lower():
         return True
 
     ## [a, b] vs. [c, d], return a==c and b==d
-    if (
-        regex.match(r"(\(|\[).+(\)|\])", prediction) is not None
-        and regex.match(r"(\(|\[).+(\)|\])", reference) is not None
-    ):
-        pred_parts = prediction[1:-1].split(",")
-        ref_parts = reference[1:-1].split(",")
-        if len(pred_parts) == len(ref_parts):
-            if all(
-                [
-                    math_equal(
-                        pred_parts[i], ref_parts[i], include_percentage, is_close
-                    )
-                    for i in range(len(pred_parts))
-                ]
-            ):
-                return True
-    if (
-        (
-            prediction.startswith("\\begin{pmatrix}")
-            or prediction.startswith("\\begin{bmatrix}")
-        )
-        and (
-            prediction.endswith("\\end{pmatrix}")
-            or prediction.endswith("\\end{bmatrix}")
-        )
-        and (
-            reference.startswith("\\begin{pmatrix}")
-            or reference.startswith("\\begin{bmatrix}")
-        )
-        and (
-            reference.endswith("\\end{pmatrix}") or reference.endswith("\\end{bmatrix}")
-        )
-    ):
-        pred_lines = [
-            line.strip()
-            for line in prediction[
-                len("\\begin{pmatrix}") : -len("\\end{pmatrix}")
-            ].split("\\\\")
-            if line.strip()
-        ]
-        ref_lines = [
-            line.strip()
-            for line in reference[
-                len("\\begin{pmatrix}") : -len("\\end{pmatrix}")
-            ].split("\\\\")
-            if line.strip()
-        ]
-        matched = True
-        if len(pred_lines) == len(ref_lines):
-            for pred_line, ref_line in zip(pred_lines, ref_lines):
-                pred_parts = pred_line.split("&")
-                ref_parts = ref_line.split("&")
-                if len(pred_parts) == len(ref_parts):
-                    if not all(
-                        [
-                            math_equal(
-                                pred_parts[i],
-                                ref_parts[i],
-                                include_percentage,
-                                is_close,
-                            )
-                            for i in range(len(pred_parts))
-                        ]
-                    ):
-                        matched = False
-                        break
-                else:
-                    matched = False
-                if not matched:
-                    break
-        else:
-            matched = False
-        if matched:
-            return True
+    if is_list_format(prediction) and is_list_format(reference):
+        return compare_lists(prediction, reference, include_percentage, is_close)
+
+    if is_matrix_format(prediction) and is_matrix_format(reference):
+        return compare_matrices(prediction, reference, include_percentage, is_close)
 
     if prediction.count("=") == 1 and reference.count("=") == 1:
-        pred = prediction.split("=")
-        pred = f"{pred[0].strip()} - ({pred[1].strip()})"
-        ref = reference.split("=")
-        ref = f"{ref[0].strip()} - ({ref[1].strip()})"
-        if symbolic_equal(pred, ref) or symbolic_equal(f"-({pred})", ref):
-            return True
-    elif (
-        prediction.count("=") == 1
-        and len(prediction.split("=")[0].strip()) <= 2
-        and "=" not in reference
-    ):
-        if math_equal(
+        return check_symbolic_equality(prediction, reference)
+    elif is_simple_equation(prediction) and "=" not in reference:
+        return check_math_equality(
             prediction.split("=")[1], reference, include_percentage, is_close
-        ):
-            return True
-    elif (
-        reference.count("=") == 1
-        and len(reference.split("=")[0].strip()) <= 2
-        and "=" not in prediction
-    ):
-        if math_equal(
+        )
+    elif is_simple_equation(reference) and "=" not in prediction:
+        return check_math_equality(
             prediction, reference.split("=")[1], include_percentage, is_close
-        ):
-            return True
+        )
 
     # symbolic equal with sympy
     if timeout:
@@ -348,6 +376,83 @@ def call_with_timeout(func, *args, timeout=1, **kwargs):
 
     return output_queue.get()
 
+class TestMathEquality(unittest.TestCase):
+
+    def test_is_numerical_equal(self):
+        self.assertTrue(is_numerical_equal("10", "10", True, True))
+        self.assertTrue(is_numerical_equal("10", "10", False, True))
+        self.assertTrue(is_numerical_equal("10", "10", True, False))
+        self.assertFalse(is_numerical_equal("10", "20", True, True))
+        self.assertTrue(is_numerical_equal("10%", "0.1", True, True))
+        self.assertFalse(is_numerical_equal("10%", "0.2", True, True))
+
+    def test_process_matrix(self):
+        prediction, reference = process_matrix("\\begin{pmatrix}1&2\\3&4\\end{pmatrix}", "{1&2,3&4}")
+        self.assertEqual(prediction, "\\begin{pmatrix}1&2\\3&4\\end{pmatrix}")
+        self.assertEqual(reference, "\\begin{pmatrix}1&2\\3&4\\end{pmatrix}")
+
+    def test_has_format(self):
+        self.assertTrue(has_format("[1, 2, 3]", "[", "]"))
+        self.assertFalse(has_format("(1, 2, 3)", "[", "]"))
+
+    def test_remove_brackets(self):
+        self.assertEqual(remove_brackets("{1, 2, 3}", ["{", "}"]), "1, 2, 3")
+        self.assertEqual(remove_brackets("(1, 2, 3)", ["(", ")"]), "1, 2, 3")
+
+    def test_is_list_format(self):
+        self.assertTrue(is_list_format("[1, 2, 3]"))
+        self.assertTrue(is_list_format("(1, 2, 3)"))
+        self.assertFalse(is_list_format("1, 2, 3"))
+
+    def test_is_matrix_format(self):
+        self.assertTrue(is_matrix_format("\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}"))
+        self.assertTrue(is_matrix_format("\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}"))
+        self.assertFalse(is_matrix_format("1 2 3 4"))
+
+    def test_compare_lists(self):
+        self.assertTrue(compare_lists("[1, 2, 3]", "[1, 2, 3]", True, True))
+        self.assertFalse(compare_lists("[1, 2, 3]", "[1, 2, 4]", True, True))
+        self.assertTrue(compare_lists("(1, 2, 3)", "(1, 2, 3)", True, True))
+
+    def test_compare_matrices(self):
+        self.assertTrue(compare_matrices("\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}", "\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}", True, True))
+        self.assertFalse(compare_matrices("\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}", "\\begin{pmatrix}1&2\\\\3&5\\end{pmatrix}", True, True))
+
+    def test_compare_structures(self):
+        self.assertTrue(compare_structures("[1, 2, 3]", "[1, 2, 3]", True, True))
+        self.assertTrue(compare_structures("\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}", "\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}", True, True))
+        self.assertFalse(compare_structures("[1, 2, 3]", "[1, 2, 4]", True, True))
+
+    def test_format_equation(self):
+        self.assertEqual(format_equation("x = y"), "x - (y)")
+
+    def test_check_symbolic_equality(self):
+        self.assertTrue(check_symbolic_equality("x = y", "x = y"))
+        self.assertFalse(check_symbolic_equality("x = y", "x = z"))
+
+    def test_check_math_equality(self):
+        self.assertTrue(check_math_equality("10", "10", True, True))
+        self.assertFalse(check_math_equality("10", "20", True, True))
+
+    def test_is_simple_equation(self):
+        self.assertTrue(is_simple_equation("x = 10"))
+        self.assertFalse(is_simple_equation("x + y = 10"))
+
+    def test_compare_equations(self):
+        self.assertTrue(compare_equations("x = y", "x = y", True, True))
+        self.assertTrue(compare_equations("x = 10", "10", True, True))
+        self.assertTrue(compare_equations("10", "x = 10", True, True))
+        self.assertFalse(compare_equations("x = y", "x = z", True, True))
+
+    def test_math_equal(self):
+        self.assertTrue(math_equal("10", "10", True, True))
+        self.assertTrue(math_equal("10%", "0.1", True, True))
+        self.assertTrue(math_equal("[1, 2, 3]", "[1, 2, 3]", True, True))
+        self.assertTrue(math_equal("\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}", "\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}", True, True))
+        self.assertTrue(math_equal("x = y", "x = y", True, True))
+        self.assertFalse(math_equal("10", "20", True, True))
+        self.assertFalse(math_equal("x = y", "x = z", True, True))
+
 def _test_math_equal():
     # print(math_equal("0.0833333333333333", "\\frac{1}{12}"))
     # print(math_equal("(1,4.5)", "(1,\\frac{9}{2})"))
@@ -393,3 +498,4 @@ def _test_math_equal():
 
 if __name__ == "__main__":
     _test_math_equal()
+    unittest.main()
