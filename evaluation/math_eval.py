@@ -2,6 +2,7 @@ import random
 import os
 import argparse
 import time
+import sglang as sgl
 from vllm import LLM, SamplingParams
 from datetime import datetime
 from tqdm import tqdm
@@ -34,8 +35,11 @@ def parse_args():
     parser.add_argument("--n_sampling", default=1, type=int)
     parser.add_argument("--top_p", default=1, type=float)
     parser.add_argument("--max_tokens_per_call", default=2048, type=int)
+    parser.add_argument("--mem_fraction_static", default=0.65, type=float)
     parser.add_argument("--shuffle", action="store_true")
-    parser.add_argument("--use_vllm", action="store_true")
+    parser.add_argument("--use_serving_engine", action="store_true", default=True)
+    parser.add_argument("--engine_type", default="sglang", type=str, choices=["sglang", "vllm"])
+    parser.add_argument("--pipeline_parallel_size", default=1, type=int)
     parser.add_argument("--save_outputs", action="store_true")
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--use_safetensors", action="store_true")
@@ -45,7 +49,6 @@ def parse_args():
         action="store_true",
         help="Apply chat template to prompt.",
     )
-    parser.add_argument("--pipeline_parallel_size", type=int, default=1)
     parser.add_argument(
         "--adapt_few_shot",
         action="store_true",
@@ -54,7 +57,7 @@ def parse_args():
     args = parser.parse_args()
     args.top_p = (
         1 if args.temperature == 0 else args.top_p
-    )  # top_p must be 1 when using greedy sampling (vllm)
+    )  # top_p must be 1 when using greedy sampling (sglang)
     return args
 
 
@@ -81,7 +84,9 @@ def prepare_data(data_name, args):
     output_dir = args.output_dir
     if not os.path.exists(output_dir):
         output_dir = f"outputs/{output_dir}"
-    out_file = f"{output_dir}/{data_name}/{out_file_prefix}_s{args.start}_e{args.end}.jsonl"
+    out_file = (
+        f"{output_dir}/{data_name}/{out_file_prefix}_s{args.start}_e{args.end}.jsonl"
+    )
     os.makedirs(f"{output_dir}/{data_name}", exist_ok=True)
 
     # load all processed samples
@@ -93,9 +98,7 @@ def prepare_data(data_name, args):
             if f.endswith(".jsonl") and f.startswith(out_file_prefix)
         ]
         for f in processed_files:
-            processed_samples.extend(
-                list(load_jsonl(f"{output_dir}/{data_name}/{f}"))
-            )
+            processed_samples.extend(list(load_jsonl(f"{output_dir}/{data_name}/{f}")))
 
     # dedepulicate
     processed_samples = {sample["idx"]: sample for sample in processed_samples}
@@ -108,19 +111,32 @@ def prepare_data(data_name, args):
 def setup(args):
     # load model
     available_gpus = os.environ["CUDA_VISIBLE_DEVICES"].split(",")
-    if args.use_vllm:
-        llm = LLM(
-            model=args.model_name_or_path,
-            tensor_parallel_size=len(available_gpus) // args.pipeline_parallel_size,
-            pipeline_parallel_size=args.pipeline_parallel_size,
-            trust_remote_code=True,
-        )
+    if args.use_serving_engine:
+        if args.engine_type == "sglang":
+            print(f"Using SGLang engine")
+            llm = sgl.Engine(
+                model_path=args.model_name_or_path,
+                tp_size=len(available_gpus),
+                trust_remote_code=True,
+                log_level="error",
+                mem_fraction_static=args.mem_fraction_static,
+            )
+        else:
+            print(f"Using VLLM engine")
+            llm = LLM(
+                model=args.model_name_or_path,
+                tensor_parallel_size=len(available_gpus) // args.pipeline_parallel_size,
+                pipeline_parallel_size=args.pipeline_parallel_size,
+                trust_remote_code=True,
+            )
+
         tokenizer = None
         if args.apply_chat_template:
             tokenizer = AutoTokenizer.from_pretrained(
                 args.model_name_or_path, trust_remote_code=True
             )
     else:
+        print(f"Using HF model")
         llm, tokenizer = load_hf_lm_and_tokenizer(
             model_name_or_path=args.model_name_or_path,
             load_in_half=True,
@@ -257,27 +273,45 @@ def main(llm, tokenizer, data_name, args):
 
         # get all outputs
         prompts = [item[1] for item in current_prompts]
-        if args.use_vllm:
-            outputs = llm.generate(
-                prompts,
-                SamplingParams(
-                    temperature=args.temperature,
-                    top_p=args.top_p,
-                    max_tokens=args.max_tokens_per_call,
-                    n=1,
-                    stop=stop_words,
-                    stop_token_ids=(
-                        [151645, 151643]
-                        if "qwen2" in args.model_name_or_path.lower()
-                        else None
+        if args.use_serving_engine:
+            if args.engine_type == "sglang":
+                outputs = llm.generate(
+                    prompts,
+                    sampling_params={
+                        "temperature": args.temperature,
+                        "top_p": args.top_p,
+                        "max_new_tokens": args.max_tokens_per_call,
+                        "n": 1,
+                        "stop": stop_words,
+                        "stop_token_ids": (
+                            [151645, 151643]
+                            if "qwen2" in args.model_name_or_path.lower()
+                            else None
+                        ),
+                    },
+                )
+                outputs = [output["text"] for output in outputs]
+            else:
+                outputs = llm.generate(
+                    prompts,
+                    SamplingParams(
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        max_tokens=args.max_tokens_per_call,
+                        n=1,
+                        stop=stop_words,
+                        stop_token_ids=(
+                            [151645, 151643]
+                            if "qwen2" in args.model_name_or_path.lower()
+                            else None
+                        ),
                     ),
-                ),
-            )
-
-            outputs = sorted(
-                outputs, key=lambda x: int(x.request_id)
-            )  # sort outputs by request_id
-            outputs = [output.outputs[0].text for output in outputs]
+                )
+                outputs = sorted(
+                    outputs, key=lambda x: int(x.request_id)
+                )  # sort outputs by request_id for VLLM
+                outputs = [output.outputs[0].text for output in outputs]
+            
         else:
             outputs = generate_completions(
                 model=llm,

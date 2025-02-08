@@ -348,6 +348,7 @@ def call_with_timeout(func, *args, timeout=1, **kwargs):
 
     return output_queue.get()
 
+
 def _test_math_equal():
     # print(math_equal("0.0833333333333333", "\\frac{1}{12}"))
     # print(math_equal("(1,4.5)", "(1,\\frac{9}{2})"))
