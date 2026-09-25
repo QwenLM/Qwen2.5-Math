@@ -385,8 +385,10 @@ def choice_answer_clean(pred: str):
 
     pred = pred.strip("\n").rstrip(".").rstrip("/").strip(" ").lstrip(":")
 
-    # Clean the answer based on the dataset
-    tmp = re.findall(r"\b(A|B|C|D|E)\b", pred.upper())
+    # Clean the answer based on the dataset. Match case-sensitively: upper-casing
+    # the whole reply first turns a lowercase word like the article "a" into a
+    # false choice-letter match.
+    tmp = re.findall(r"\b(A|B|C|D|E)\b", pred)
     if tmp:
         pred = tmp
     else:
